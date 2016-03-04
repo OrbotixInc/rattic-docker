@@ -1,4 +1,6 @@
-#!/bin/sh -ue
+#!/bin/bash -x
+
+echo "Starting rattic with $@"
 
 # should be exported by linked postgres image
 : "${POSTGRES_PORT_5432_TCP_ADDR:=postgres}"
@@ -15,17 +17,6 @@
 : "${POSTGRES_PORT:=$POSTGRES_PORT_5432_TCP_PORT}"
 : "${POSTGRES_DBNAME:=postgres}"
 : "${POSTGRES_USERNAME:=postgres}"
-: "${LDAP_URI:=ldap://ldap}"
-: "${LDAP_STARTTLS:=false}"
-: "${LDAP_REQCERT:=false}"
-: "${LDAP_BASE:=dc=example,dc=com}"
-: "${LDAP_USERBASE:=cn=users,cn=accounts,$LDAP_BASE}"
-: "${LDAP_USERFILTER:=(uid=%(user)s)}"
-: "${LDAP_GROUPBASE:=cn=groups,cn=accounts,$LDAP_BASE}"
-: "${LDAP_GROUPFILTER:=(objectClass=groupofnames)}"
-: "${LDAP_GROUPTYPE:=GroupOfNamesType}"
-: "${LDAP_USERFIRSTNAME:=givenName}"
-: "${LDAP_USERLASTNAME:=sn}"
 
 cat > /opt/rattic/conf/local.cfg <<EOF
 [ratticweb]
@@ -52,35 +43,6 @@ cat >> /opt/rattic/conf/local.cfg <<EOF
 password = $POSTGRES_PASSWORD
 EOF
 fi
-
-cat >> /opt/rattic/conf/local.cfg <<EOF
-[ldap]
-pwchange = false
-uri = $LDAP_URI
-requirecert = $LDAP_REQCERT
-starttls = $LDAP_STARTTLS
-userbase = $LDAP_USERBASE
-userfilter = $LDAP_USERFILTER
-groupbase = $LDAP_GROUPBASE
-groupfilter = $LDAP_GROUPFILTER
-grouptype = $LDAP_GROUPTYPE
-userfirstname = $LDAP_USERFIRSTNAME
-userlastname = $LDAP_USERLASTNAME
-EOF
-
-if [ -n "$LDAP_BINDDN" ]; then
-    cat >> /opt/rattic/conf/local.cfg <<EOF
-binddn = $LDAP_BINDDN
-bindpw = $LDAP_BINDPW
-EOF
-fi
-
-if [ -n "$LDAP_STAFFDN" ]; then
-    cat >> /opt/rattic/conf/local.cfg <<EOF
-staff = $LDAP_STAFFDN
-EOF
-fi
-
 
 cd /opt/rattic
 # for debugging config

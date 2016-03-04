@@ -77,5 +77,4 @@ COPY entrypoint.sh /
 
 VOLUME /opt/rattic/static
 EXPOSE 8000
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["serve"]
+CMD /entrypoint.sh serve
